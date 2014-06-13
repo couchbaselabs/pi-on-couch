@@ -50,14 +50,12 @@ class PiOnCouch
     include Java::com.couchbase.lite.replicator.Replication::ChangeListener
     java_signature 'void changed(ChangeEvent event)'
     def changed event
-      def changed event
-        replication = event.getSource();
-        if replication.getLastError
-          $log.warn "replication encountered an error: #{replication.getLastError}"
-        else
-          $log.debug "#{replication.getCompletedChangesCount} of #{replication.getChangesCount} changes replicated"
-          $ui.reload_data if $ui
-        end
+      replication = event.getSource();
+      if replication.getLastError
+        $log.warn "replication encountered an error: #{replication.getLastError}"
+      else
+        $log.debug "#{replication.getCompletedChangesCount} of #{replication.getChangesCount} changes replicated"
+        $ui.reload_data if $ui
       end
     end
   end
