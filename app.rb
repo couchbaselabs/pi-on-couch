@@ -144,6 +144,8 @@ class PiOnCouch
 
   def initialize
     ctx = JavaContext.new
+    sync_url_string = java.lang.String.new(SYNC_URL.to_java_bytes).java_object
+    @sync_url = java.net.URL.new(sync_url_string).java_object
     @manager = Manager.new ctx, Manager::DEFAULT_OPTIONS
   end
 
@@ -157,14 +159,12 @@ class PiOnCouch
   end
 
   def setup_sync
-    sync_url = java.net.URL.new(java.lang.String.new(SYNC_URL.to_java_bytes).java_object)
-
-    @pullRep = database.createPullReplication(sync_url.java_object)
+    @pullRep = database.createPullReplication(@sync_url)
     @pullRep.setContinuous(true)
     @pullRep.addChangeListener(change_listener)
     @pullRep.start
 
-    @pushRep = database.createPushReplication(sync_url.java_object)
+    @pushRep = database.createPushReplication(@sync_url)
     @pushRep.setContinuous(true)
     @pushRep.addChangeListener(change_listener)
     @pushRep.start
