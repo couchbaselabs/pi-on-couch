@@ -30,6 +30,5 @@ the SYNC\_URL in the app.rb
 
 Send a message, sync with remote and receive on all connected devices.
 
-<img src="https://farm6.staticflickr.com/5031/14411058895_c9be89a60d_s.jpg"
-width="400" height="400" alt="pi-on-couch">
-
+<img src="https://farm6.staticflickr.com/5031/14411058895_c9be89a60d.jpg"
+width="500" height="391" alt="pi-on-couch">
