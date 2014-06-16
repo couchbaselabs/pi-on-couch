@@ -35,14 +35,28 @@ class PiOnCouch
   include_package "com.couchbase.lite"
 
   class Message
-    def self.find_all database
-      query = database.createAllDocumentsQuery
+    def initialize database
+      @database = database
+    end
+
+    def find_all
+      query = @database.createAllDocumentsQuery
       rows = query.run
       documents = []
       while row = rows.next
         documents << row.document if row.document.getProperties["type"] == "message"
       end
       documents
+    end
+
+    def create text
+      document = @database.createDocument
+      data = {
+        "message" => text,
+        "channels" => ["test"],
+        "type" => "message"
+      }
+      document.putProperties data
     end
   end
 
@@ -63,10 +77,10 @@ class PiOnCouch
   def change_listener; ChangeListenerImpl.new; end
 
   class UI < JFrame
-    def initialize database
+    def initialize message
       super "PiOnCouch"
 
-      @database = database
+      @message = message
 
       UIManager.setLookAndFeel UIManager.getSystemLookAndFeelClassName
 
@@ -78,7 +92,7 @@ class PiOnCouch
       input_panel = JPanel.new
       input_panel.setLayout FlowLayout.new
 
-      setSize 800, 600
+      setSize 400, 600
       setDefaultCloseOperation JFrame::EXIT_ON_CLOSE
       setLocationRelativeTo nil
 
@@ -105,19 +119,13 @@ class PiOnCouch
 
       send_btn.addActionListener do |e|
         message_text = input_field.getText()
-        document = @database.createDocument
-        data = {
-          "message" => message_text,
-          "channels" => ["test"],
-          "type" => "message"
-        }
-        document.putProperties data
+        @message.create message_text
         $log.debug "creating new message: #{message_text}"
       end
     end
 
     def reload_data
-      documents = Message.find_all @database
+      documents = @message.find_all
       model = @table.getModel
       documents.each do |doc|
         if !@data_present.include?(doc.getProperties["_id"])
@@ -132,12 +140,12 @@ class PiOnCouch
   end
 
   def setup_ui
-    $ui = UI.new database
+    $ui = UI.new message
   end
 
   # Debug!!!
   def dump_all
-    Message.find_all(database).map(&:getProperties)
+    Message.new(database).find_all.map(&:getProperties)
   end
 
   def initialize
@@ -145,6 +153,10 @@ class PiOnCouch
     sync_url_string = java.lang.String.new(SYNC_URL.to_java_bytes).java_object
     @sync_url = java.net.URL.new(sync_url_string).java_object
     @manager = Manager.new ctx, Manager::DEFAULT_OPTIONS
+  end
+
+  def message
+    @message ||= Message.new database
   end
 
   def database
