@@ -1,4 +1,4 @@
-PI_IP = "192.168.0.14"
+PI_IP = "sideshowcoder.no-ip.info"
 PI_USER = "pi"
 
 desc "ship the current project of to the pi"
