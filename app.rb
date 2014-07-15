@@ -92,7 +92,7 @@ class PiOnCouch
       input_panel = JPanel.new
       input_panel.setLayout FlowLayout.new
 
-      setSize 400, 600
+      setSize 400, 500
       setDefaultCloseOperation JFrame::EXIT_ON_CLOSE
       setLocationRelativeTo nil
 
@@ -115,6 +115,7 @@ class PiOnCouch
       input_field.requestFocus
       setLocationRelativeTo nil
       setVisible true
+      setResizable false
       reload_data
 
       send_btn.addActionListener do |e|
