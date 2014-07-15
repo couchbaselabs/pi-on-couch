@@ -1,3 +1,5 @@
+require "tmpdir"
+
 PI_IP = "sideshowcoder.no-ip.info"
 PI_USER = "pi"
 
