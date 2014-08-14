@@ -1,5 +1,6 @@
 require "java"
 require "logger"
+require "uri"
 
 java_import java.awt.FlowLayout
 java_import java.awt.BorderLayout
@@ -25,7 +26,6 @@ elsif RbConfig::CONFIG["target_cpu"] =~ /arm/
   require "vendor/linux_arm/couchbase-lite-java-native.jar"
 end
 
-SYNC_URL = "http://sync.couchbasecloud.com/pi-on-couch"
 
 $log = Logger.new(STDOUT)
 $log.level = Logger::DEBUG
@@ -149,9 +149,9 @@ class PiOnCouch
     Message.new(database).find_all.map(&:getProperties)
   end
 
-  def initialize
+  def initialize sync_url
     ctx = JavaContext.new
-    sync_url_string = java.lang.String.new(SYNC_URL.to_java_bytes).java_object
+    sync_url_string = java.lang.String.new(sync_url.to_java_bytes).java_object
     @sync_url = java.net.URL.new(sync_url_string).java_object
     @manager = Manager.new ctx, Manager::DEFAULT_OPTIONS
   end
@@ -181,13 +181,34 @@ class PiOnCouch
     @pushRep.start
   end
 
-  def self.run
-    this = new
+  def self.run sync_url
+    this = new(sync_url)
     this.setup_sync
     this.setup_ui
     this
   end
 end
 
-PiOnCouch.run
+# Display usage
+def usage
+  puts <<EOF
+Usage: jruby app.rb SYNC_URL"
+
+example: jruby app.rb http://sync.couchbasecloud.com/pi-on-couch
+EOF
+  exit 1
+end
+
+# validate uri for sync
+def valid_uri? uri
+  begin
+    URI(uri).scheme == "http"
+  rescue URI::InvalidURIError
+    false
+  end
+end
+
+usage if ARGV.length != 1 || ARGV[0] == "-h" || !valid_uri?(ARGV[0])
+
+PiOnCouch.run ARGV[0]
 
