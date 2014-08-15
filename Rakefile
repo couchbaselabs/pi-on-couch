@@ -3,6 +3,11 @@ require "rake/clean"
 
 CLOBBER << "data" # cleanup the couchbase lite data
 
+desc "run sync_gateway with the default config"
+task :sync_gateway do
+  system "sync_gateway config/sync_gateway_config.json"
+end
+
 desc "ship the current project of to the pi"
 task :ship_to_pi, [:host, :username] do |t, args|
   Dir.mktmpdir do |dir|

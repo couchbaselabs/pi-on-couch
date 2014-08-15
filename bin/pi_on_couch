@@ -1,0 +1,32 @@
+require "uri"
+require "logger"
+require_relative "../app/app"
+
+# Display usage
+def usage
+  puts <<EOF
+Usage: jruby app.rb SYNC_URL"
+
+example: jruby app.rb http://sync.couchbasecloud.com/pi-on-couch
+EOF
+  exit 1
+end
+
+# validate uri for sync
+def valid_uri? uri
+  begin
+    URI(uri).scheme == "http"
+  rescue URI::InvalidURIError
+    false
+  end
+end
+
+usage if ARGV.length != 1 || ARGV[0] == "-h" || !valid_uri?(ARGV[0])
+
+# setup the environment
+$log = Logger.new(STDOUT)
+$log.level = Logger::DEBUG
+$app = false # hold window ref to update
+
+PiOnCouch::Application.new ARGV[0]
+
