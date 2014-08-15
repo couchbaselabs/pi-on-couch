@@ -1,7 +1,14 @@
 require "tmpdir"
 require "rake/clean"
+require "rake/testtask"
 
 CLOBBER << "data" # cleanup the couchbase lite data
+
+Rake::TestTask.new do |t|
+  t.libs << "app"
+  t.libs << "test"
+   t.pattern = "test/*_test.rb"
+end
 
 desc "run sync_gateway with the default config"
 task :sync_gateway do

@@ -12,8 +12,8 @@ elsif RbConfig::CONFIG["target_cpu"] =~ /arm/
   require "#{VENDOR_PATH}/linux_arm/couchbase-lite-java-native.jar"
 end
 
-require_relative "controllers/messages_controller"
-require_relative "services/replication_change_notifier"
+require "controllers/messages_controller"
+require "services/replication_change_notifier"
 
 module PiOnCouch
   class Application

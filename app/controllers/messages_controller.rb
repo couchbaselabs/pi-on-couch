@@ -12,7 +12,7 @@ java_import javax.swing.BoxLayout
 java_import javax.swing.JScrollPane
 java_import javax.swing.Box
 
-require_relative "../models/message"
+require "models/message"
 
 module PiOnCouch
   class MessagesController < JFrame
@@ -24,7 +24,7 @@ module PiOnCouch
     def initialize
       super "PiOnCouch"
 
-      @message = Message.new(Application.root_application.database)
+      @message = Message.new
 
       UIManager.look_and_feel = UIManager.system_look_and_feel_class_name
 
@@ -61,9 +61,8 @@ module PiOnCouch
       reload_data
 
       send_btn.add_action_listener do |e|
-        message_text = input_field.getText()
-        @message.create message_text
-        $log.debug "creating new message: #{message_text}"
+        @message.create input_field.text
+        $log.debug "creating new message: #{input_field.text}"
       end
     end
 
@@ -72,8 +71,8 @@ module PiOnCouch
       model = @table.getModel
       documents.each do |doc|
         if !@data_present.include?(doc.getProperties["_id"])
-          @data_present << doc.getProperties["_id"]
-          message = doc.getProperties["message"]
+          @data_present << doc.properties["_id"]
+          message = doc.properties["message"]
           if message
             model.insertRow 0, [java.lang.String.new(message.to_java_bytes)].to_java(:String)
           end
