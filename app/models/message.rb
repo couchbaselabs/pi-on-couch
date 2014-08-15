@@ -5,23 +5,23 @@ module PiOnCouch
     end
 
     def find_all
-      query = @database.createAllDocumentsQuery
+      query = @database.create_all_documents_query
       rows = query.run
       documents = []
       while row = rows.next
-        documents << row.document if row.document.getProperties["type"] == "message"
+        documents << row.document if row.document.properties["type"] == "message"
       end
       documents
     end
 
     def create text
-      document = @database.createDocument
+      document = @database.create_document
       data = {
         "message" => text,
         "channels" => ["test"],
         "type" => "message"
       }
-      document.putProperties data
+      document.put_properties data
     end
   end
 end

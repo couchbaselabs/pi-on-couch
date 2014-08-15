@@ -49,20 +49,20 @@ module PiOnCouch
     end
 
     def setup_sync sync_url
-      pullRep = database.createPullReplication(sync_url)
-      pullRep.setContinuous true
+      pullRep = database.create_pull_replication(sync_url)
+      pullRep.continuous = true
 
       pull_listener = ReplicationChangeNotifier.new
-      pull_listener.register_replication_success_listener @messages_controller
+      pull_listener.add_replication_success_listener @messages_controller
 
-      pullRep.addChangeListener pull_listener
+      pullRep.add_change_listener pull_listener
       pullRep.start
 
-      pushRep = database.createPushReplication(sync_url)
-      pushRep.setContinuous true
+      pushRep = database.create_push_replication(sync_url)
+      pushRep.continuous = true
 
       push_listener = ReplicationChangeNotifier.new
-      pushRep.addChangeListener push_listener
+      pushRep.add_change_listener push_listener
       pushRep.start
     end
   end

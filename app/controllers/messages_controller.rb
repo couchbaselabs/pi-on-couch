@@ -17,26 +17,27 @@ require_relative "../models/message"
 module PiOnCouch
   class MessagesController < JFrame
     # callback for listening to replication successes
-    def replication_success; reload_data; end
+    def replication_success
+      reload_data
+    end
 
     def initialize
       super "PiOnCouch"
 
       @message = Message.new(Application.root_application.database)
 
-      UIManager.setLookAndFeel UIManager.getSystemLookAndFeelClassName
+      UIManager.look_and_feel = UIManager.system_look_and_feel_class_name
 
       panel = JPanel.new
-      panel_layout = BoxLayout.new panel, BoxLayout::Y_AXIS
-      panel.setLayout panel_layout
-      panel.setOpaque true
+      panel.layout = BoxLayout.new(panel, BoxLayout::Y_AXIS)
+      panel.opaque = true
 
       input_panel = JPanel.new
-      input_panel.setLayout FlowLayout.new
+      input_panel.layout = FlowLayout.new
 
-      setSize 400, 500
-      setDefaultCloseOperation JFrame::EXIT_ON_CLOSE
-      setLocationRelativeTo nil
+      self.setSize 400, 500
+      self.default_close_operation = JFrame::EXIT_ON_CLOSE
+      self.location_relative_to = nil
 
       send_btn = JButton.new "Send"
       input_field = JTextField.new 20
@@ -50,17 +51,16 @@ module PiOnCouch
       input_panel.add send_btn
       panel.add input_panel
       scroll_pane = JScrollPane.new(@table)
-      getContentPane.add BorderLayout::NORTH, scroll_pane
-      getContentPane.add BorderLayout::CENTER, panel
+      content_pane.add BorderLayout::NORTH, scroll_pane
+      content_pane.add BorderLayout::CENTER, panel
 
-      setLocationByPlatform true
+      self.location_by_platform = true
       input_field.requestFocus
-      setLocationRelativeTo nil
-      setVisible true
-      setResizable false
+      self.visible = true
+      self.resizable = false
       reload_data
 
-      send_btn.addActionListener do |e|
+      send_btn.add_action_listener do |e|
         message_text = input_field.getText()
         @message.create message_text
         $log.debug "creating new message: #{message_text}"
