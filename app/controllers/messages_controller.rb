@@ -1,21 +1,11 @@
-java_import java.awt.FlowLayout
-java_import java.awt.BorderLayout
-java_import javax.swing.JFrame
-java_import javax.swing.JTable
-java_import javax.swing.JButton
-java_import javax.swing.JPanel
-java_import javax.swing.JTextField
-java_import javax.swing.JTextArea
-java_import javax.swing.JOptionPane
-java_import javax.swing.UIManager
-java_import javax.swing.BoxLayout
-java_import javax.swing.JScrollPane
-java_import javax.swing.Box
-
 require "models/message"
 
 module PiOnCouch
-  class MessagesController < JFrame
+
+  class MessagesController < javax.swing.JFrame
+    include_package "java.awt"
+    include_package "javax.swing"
+
     # callback for listening to replication successes
     def replication_success
       reload_data
