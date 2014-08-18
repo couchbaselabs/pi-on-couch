@@ -5,11 +5,7 @@ module PiOnCouch
   class MessagesController < javax.swing.JFrame
     include_package "java.awt"
     include_package "javax.swing"
-
-    # callback for listening to replication successes
-    def replication_success
-      reload_data
-    end
+    include_package "com.couchbase.lite"
 
     def initialize
       super "PiOnCouch"
@@ -48,7 +44,8 @@ module PiOnCouch
       input_field.requestFocus
       self.visible = true
       self.resizable = false
-      reload_data
+
+      load_data
 
       send_btn.add_action_listener do |e|
         @message.create input_field.text
@@ -56,18 +53,27 @@ module PiOnCouch
       end
     end
 
-    def reload_data
-      documents = @message.find_all
-      model = @table.getModel
-      documents.each do |doc|
-        if !@data_present.include?(doc.getProperties["_id"])
-          @data_present << doc.properties["_id"]
+    class MessagesUpdateListener
+      def initialize table
+        @table = table
+      end
+
+      include Java::com.couchbase.lite.LiveQuery::ChangeListener
+      java_signature "void changed(final LiveQuery.ChangeEvent event)"
+      def changed event
+        @table.model.row_count = 0 # reset the table
+        documents = event.get_rows.map(&:document)
+        documents.each do |doc|
           message = doc.properties["message"]
-          if message
-            model.insertRow 0, [message].to_java(:String)
-          end
+          @table.model.insertRow 0, [message].to_java(:String)
         end
       end
+    end
+
+    def load_data
+      query = @message.find_all_by_date.to_live_query
+      query.add_change_listener MessagesUpdateListener.new(@table)
+      query.start
     end
   end
 end

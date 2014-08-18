@@ -1,35 +1,34 @@
 require "test_helper"
 require "models/message"
-
+require "services/database"
 
 module PiOnCouch
-  # fake out a quick root application class to get us a database to work with
-  # TODO this should be move somewhere central
-  class Application
-    include_package "com.couchbase.lite"
-    def self.root_application; new; end
-
-    def database
-      manager = Manager.new JavaContext.new, Manager::DEFAULT_OPTIONS
-
-      db_name = "test-database"
-      return false unless Manager.isValidDatabaseName(db_name)
-
-      manager.getDatabase(db_name)
-    end
-  end
 
   describe Message do
     subject { Message.new }
 
+    before do
+      Database.establish_connection "test-database"
+    end
+
     after do
       # clean up
-      Application.root_application.database.delete
+      Database.connection("test-database").delete
     end
 
     it "creates a message" do
-      subject.create "I am a message"
-      subject.find_all.length.must_equal 1
+      text = "I am a message"
+      subject.create text
+      subject.find_all_by_date.run.to_a.length.must_equal 1
+      subject.find_all_by_date.run.first.document.properties["message"].must_equal text
+    end
+
+    it "orders messages" do
+      subject.create "A"
+      sleep 2 # make sure the timestamp has changed since we don't care about in secound order
+      subject.create "B"
+      subject.find_all_by_date.run.first.document.properties["message"].must_equal "A"
+      subject.find_all_by_date.run.to_a[1].document.properties["message"].must_equal "B"
     end
   end
 end
