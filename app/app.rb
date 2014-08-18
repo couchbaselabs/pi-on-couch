@@ -24,9 +24,6 @@ module PiOnCouch
     end
 
     def initialize sync_url
-      sync_url_string = java.lang.String.new(sync_url.to_java_bytes).java_object
-      sync_url = java.net.URL.new(sync_url_string).java_object
-
       # store reference to root application
       Application.root_application = self
 
@@ -49,7 +46,8 @@ module PiOnCouch
     end
 
     def setup_sync sync_url
-      pullRep = database.create_pull_replication(sync_url)
+      url = java.net.URL.new(sync_url)
+      pullRep = database.create_pull_replication(url)
       pullRep.continuous = true
 
       pull_listener = ReplicationChangeNotifier.new
@@ -58,7 +56,7 @@ module PiOnCouch
       pullRep.add_change_listener pull_listener
       pullRep.start
 
-      pushRep = database.create_push_replication(sync_url)
+      pushRep = database.create_push_replication(url)
       pushRep.continuous = true
 
       push_listener = ReplicationChangeNotifier.new

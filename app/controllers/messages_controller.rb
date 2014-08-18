@@ -64,7 +64,7 @@ module PiOnCouch
           @data_present << doc.properties["_id"]
           message = doc.properties["message"]
           if message
-            model.insertRow 0, [java.lang.String.new(message.to_java_bytes)].to_java(:String)
+            model.insertRow 0, [message].to_java(:String)
           end
         end
       end
