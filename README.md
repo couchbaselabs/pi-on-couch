@@ -1,3 +1,5 @@
+⚠️ This repo is obsolete.  It was developed using a version of Couchbase Lite that reached end of life years ago.
+
 # Pi on Couch
 Demo Couchbase Lite and the syncing capabilities, running on MacOS and Raspbian
 (Raspberry Pi). The app is developed using jRuby and Couchbase Lite Java.
